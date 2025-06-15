@@ -25,6 +25,7 @@ class ExplotacionViewer:
         tk.Button(self.frame_botones, text="Eliminar", command=self.eliminar).grid(row=0, column=1, padx=5)
         tk.Button(self.frame_botones, text="Activar", command=self.activar).grid(row=0, column=2, padx=5)
         
+        
         self.recargar()
 
     def recargar(self):

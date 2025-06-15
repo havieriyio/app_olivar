@@ -8,7 +8,7 @@ def obtener_conexion():
 def obtener_todas_explotaciones():
     with obtener_conexion() as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT id, nombre, ubicacion, activa FROM explotacion ORDER BY nombre")
+        cursor.execute("SELECT id, nombre, ubicacion, activa FROM explotacion ORDER BY id")
         return cursor.fetchall()
 
 def insertar_explotacion(nombre, ubicacion):

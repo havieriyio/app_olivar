@@ -18,16 +18,22 @@ class VentanaPrincipal(tk.Tk):
         explotacion = obtener_explotacion_activa()
         nombre_explotacion = explotacion[1] if explotacion else "Ninguna"
         
-        #tk.Label(self, text=f"Bienvenido, {usuario['nombre']} | Explotación activa: {nombre_explotacion}", font=("Arial", 14)).pack(fill="x", padx=10, pady=5)
-        self.actualizar_encabezado()
-
-       # Aquí creas el frame del menú
+       # Aquí creo el frame del menú
         self.menu_frame = tk.Frame(self, bg="#dddddd", width=200)
         self.menu_frame.pack(side="left", fill="y")
 
         self.label_usuario_explotacion = tk.Label(self, font=("Arial", 10), anchor="w")
         self.label_usuario_explotacion.pack(fill=tk.X, padx=10, pady=5)
 
+        # Frame dedicado para la cabecera.
+        self.frame_encabezado = tk.Frame(self)
+        self.frame_encabezado.pack(fill="x")
+
+        self.label_explotacion = tk.Label(self.frame_encabezado, font=("Arial", 14))
+        self.label_explotacion.pack(fill="x", padx=10, pady=5)
+        
+        self.actualizar_encabezado()
+        
         tk.Button(self.menu_frame, text="Explotaciones", command=self.abrir_gestion_explotaciones).pack(fill="x", pady=5)
         tk.Button(self.menu_frame, text="Parcelas", command=self.abrir_gestion_parcelas).pack(pady=5, fill="x")
         tk.Button(self.menu_frame, text="Tipos de análisis", command=self.abrir_gestion_analisis).pack(pady=5, fill="x")
@@ -57,6 +63,7 @@ class VentanaPrincipal(tk.Tk):
         usuario = getattr(self, "usuario", "Desconocido")
         explotacion = obtener_explotacion_activa()
         nombre_explotacion = explotacion[1] if explotacion else "Ninguna"
-        tk.Label(self, text=f"Bienvenido, {usuario['nombre']} | Explotación activa: {nombre_explotacion}", font=("Arial", 14)).pack(fill="x", padx=10, pady=5)
+
+        self.label_explotacion.config(text=f"Bienvenido, {usuario['nombre']} | Explotación activa: {nombre_explotacion}")
 
     
