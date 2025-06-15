@@ -20,29 +20,29 @@ class ExplotacionViewer(tk.Toplevel):
         # Frame de botones
         self.frame_botones = tk.Frame(self)
         self.frame_botones.pack(pady=10)
+        '''
+        self.frame_botones = tk.Frame(self.win)
+        self.frame_botones.pack(pady=10)'''
 
         # Botón activar
         tk.Button(self.frame_botones, text="Activar", command=self.activar_explotacion_seleccionada).grid(row=0, column=0, padx=5)
 
-
-        # Cargar explotaciones en la tabla
-        self.cargar_explotaciones()
-
-        self.frame_botones = tk.Frame(self.win)
-        self.frame_botones.pack(pady=10)
-
         tk.Button(self.frame_botones, text="Añadir", command=self.anadir).grid(row=0, column=0, padx=5)
         tk.Button(self.frame_botones, text="Eliminar", command=self.eliminar).grid(row=0, column=1, padx=5)
-        tk.Button(self.frame_botones, text="Activar", command=self.activar).grid(row=0, column=2, padx=5)
+        tk.Button(self.frame_botones, text="Activar", command=self.activar_explotacion_seleccionada).grid(row=0, column=2, padx=5)
         
+        # Cargar explotaciones en la tabla
+        self.cargar_explotaciones()
         
         self.recargar()
 
     def recargar(self):
-        self.lista.delete(0, tk.END)
-        for e in modelo.obtener_todas_explotaciones():
-            estado = " (activa)" if e[3] else ""
-            self.lista.insert(tk.END, f"{e[0]} - {e[1]} ({e[2]}){estado}")
+        # Borra todo el contenido del Treeview
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+        
+        # Carga las explotaciones nuevamente
+        self.cargar_explotaciones()
 
     def anadir(self):
         top = tk.Toplevel(self.win)
