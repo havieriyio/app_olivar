@@ -1,4 +1,5 @@
 import sqlite3
+from modelo.db import conectar 
 
 DB_PATH = "olivar.db"
 
@@ -36,3 +37,17 @@ def borrar_parcela(id_parcela):
     cursor.execute("DELETE FROM parcela WHERE id = ?", (id_parcela,))
     conn.commit()
     conn.close()
+
+def obtener_parcelas_por_explotacion(id_explotacion):
+    conn = conectar()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT id, nombre, superficie, ubicacion
+        FROM parcela
+        WHERE idExplotacion = ?
+    """, (id_explotacion,))
+
+    resultados = cursor.fetchall()
+    conn.close()
+    return resultados

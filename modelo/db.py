@@ -3,6 +3,10 @@ import sqlite3
 
 DB_PATH = "olivar.db"
 
+
+def conectar():
+    return sqlite3.connect(DB_PATH)
+
 def validar_login(usuario, contraseña, db_path=DB_PATH):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()

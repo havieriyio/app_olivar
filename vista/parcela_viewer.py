@@ -9,6 +9,8 @@ from modelo.acceso_parcelas import (
 )
 
 from modelo.acceso_arbol import obtener_arboles_por_parcela,obtener_variedades, insertar_arbol
+from modelo.acceso_explotacion import obtener_explotacion_activa
+from modelo.acceso_parcelas import obtener_parcelas_por_explotacion
 
 import datetime
 
@@ -30,6 +32,11 @@ class ParcelaViewer(tk.Frame):
         # Panel derecho: árboles
         self.frame_derecha = tk.Frame(self.panel_contenido, bg="white")
         self.frame_derecha.pack(side="left", fill="both", expand=True, padx=10, pady=10)
+
+        explotacion = obtener_explotacion_activa()
+        if explotacion:
+            parcelas = obtener_parcelas_por_explotacion(explotacion[0])  # ID
+            # cargar las parcelas en la UI
 
         # Árbol de parcelas
         self.tree_parcelas = ttk.Treeview(

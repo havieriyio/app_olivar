@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import messagebox
 from modelo import acceso_explotacion as modelo
+from modelo.acceso_explotacion import obtener_explotacion_activa
+from modelo.acceso_parcelas import obtener_parcelas_por_explotacion
 
 class ExplotacionViewer:
     def __init__(self, parent):
@@ -75,5 +77,16 @@ class ExplotacionViewer:
             self.principal.actualizar_encabezado()
 
             self.recargar()
+
+    def seleccionar_explotacion(self, id_explotacion):
+        # Aquí marcas la explotación activa en la base de datos
+        modelo.establecer_explotacion_activa(id_explotacion)
+
+        # Llamas al método de la ventana principal para recargar encabezado y parcelas
+        self.parent.actualizar_encabezado()
+        self.parent.abrir_gestion_parcelas()
+
+        # Cierra esta ventana
+        self.destroy()
 
     
