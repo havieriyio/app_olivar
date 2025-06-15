@@ -12,6 +12,8 @@ class VentanaPrincipal(tk.Tk):
         self.usuario = usuario
         self.title("Sistema de Análisis de Olivar")
         self.geometry("1500x600")
+
+        self.panel_parcela = None
         
         explotacion = obtener_explotacion_activa()
         nombre_explotacion = explotacion[1] if explotacion else "Ninguna"
@@ -31,6 +33,9 @@ class VentanaPrincipal(tk.Tk):
         tk.Button(self.menu_frame, text="Tipos de análisis", command=self.abrir_gestion_analisis).pack(pady=5, fill="x")
         tk.Button(self.menu_frame, text="Cerrar sesión", command=self.destroy).pack(side="bottom", pady=10)
 
+        self.contenedor_panel = tk.Frame(self)
+        self.contenedor_panel.pack(fill='both', expand=True)
+
         self.main_frame = tk.Frame(self, bg="white")
         self.main_frame.pack(side="right", expand=True, fill="both")
 
@@ -38,7 +43,12 @@ class VentanaPrincipal(tk.Tk):
         ExplotacionViewer(self)
 
     def abrir_gestion_parcelas(self):
-        ParcelaViewer(self)
+        for widget in self.contenedor_panel.winfo_children():
+            widget.destroy()
+
+        # Crea e inserta el nuevo panel
+        self.panel_parcela = ParcelaViewer(self.contenedor_panel)
+        self.panel_parcela.pack(fill='both', expand=True)
 
     def abrir_gestion_analisis(self):
         AnalisisViewer(self)

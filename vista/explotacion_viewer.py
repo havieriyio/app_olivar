@@ -3,9 +3,9 @@ from tkinter import messagebox
 from modelo import acceso_explotacion as modelo
 
 class ExplotacionViewer:
-    def __init__(self, master):
-        self.win = tk.Toplevel(master)
-        self.principal = master
+    def __init__(self, parent):
+        self.win = tk.Toplevel(parent)
+        self.principal = parent
         self.win.title("Gestión de Explotaciones")
         
         self.frame_lista = tk.Frame(self.win)

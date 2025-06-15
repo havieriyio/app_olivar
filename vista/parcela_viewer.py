@@ -12,10 +12,11 @@ from modelo.acceso_arbol import obtener_arboles_por_parcela,obtener_variedades, 
 
 import datetime
 
-class ParcelaViewer:
-    def __init__(self, master):
-        self.master = master
-        self.gestion_frame = tk.Frame(master)
+class ParcelaViewer(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+        self.gestion_frame = tk.Frame(parent)
         self.gestion_frame.pack(fill="both", expand=True)
 
         # Contenedor dividido en dos paneles
