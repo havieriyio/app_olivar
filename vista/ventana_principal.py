@@ -28,10 +28,10 @@ class VentanaPrincipal(tk.Tk):
         self.label_usuario_explotacion = tk.Label(self, font=("Arial", 10), anchor="w")
         self.label_usuario_explotacion.pack(fill=tk.X, padx=10, pady=5)
 
-        tk.Button(self.menu_frame, text="Explotaciones", command=self.abrir_gestion_explotaciones).pack(padx=10, pady=5)
+        tk.Button(self.menu_frame, text="Explotaciones", command=self.abrir_gestion_explotaciones).pack(fill="x", pady=5)
         tk.Button(self.menu_frame, text="Parcelas", command=self.abrir_gestion_parcelas).pack(pady=5, fill="x")
         tk.Button(self.menu_frame, text="Tipos de análisis", command=self.abrir_gestion_analisis).pack(pady=5, fill="x")
-        tk.Button(self.menu_frame, text="Cerrar sesión", command=self.destroy).pack(side="bottom", pady=10)
+        tk.Button(self.menu_frame, text="Cerrar sesión", command=self.destroy).pack(side="bottom", pady=10,fill="x")
 
         self.contenedor_panel = tk.Frame(self)
         self.contenedor_panel.pack(fill='both', expand=True)
