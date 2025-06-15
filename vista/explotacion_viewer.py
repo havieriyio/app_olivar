@@ -45,7 +45,7 @@ class ExplotacionViewer(tk.Toplevel):
         self.cargar_explotaciones()
 
     def anadir(self):
-        top = tk.Toplevel(self.win)
+        top = tk.Toplevel(self)
         top.title("Nueva Explotación")
 
         tk.Label(top, text="Nombre").grid(row=0, column=0)
@@ -67,10 +67,19 @@ class ExplotacionViewer(tk.Toplevel):
         tk.Button(top, text="Guardar", command=guardar).grid(row=2, column=0, columnspan=2, pady=5)
 
     def eliminar(self):
-        seleccion = self.lista.curselection()
-        if seleccion:
-            texto = self.lista.get(seleccion)
-            id_explotacion = int(texto.split(" - ")[0])
+        seleccion = self.tree.selection()
+
+        if not seleccion:
+            return  # Nada seleccionado
+
+        id_explotacion = int(seleccion[0])  # El Treeview usa el id como iid
+
+        confirmacion = messagebox.askyesno(
+            "Confirmar eliminación",
+            "¿Está seguro de que desea eliminar esta explotación?"
+        )
+
+        if confirmacion:
             modelo.eliminar_explotacion(id_explotacion)
             self.recargar()
 

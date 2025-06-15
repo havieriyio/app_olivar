@@ -33,10 +33,6 @@ class ParcelaViewer(tk.Frame):
         self.frame_derecha = tk.Frame(self.panel_contenido, bg="white")
         self.frame_derecha.pack(side="left", fill="both", expand=True, padx=10, pady=10)
 
-        explotacion = obtener_explotacion_activa()
-        if explotacion:
-            parcelas = obtener_parcelas_por_explotacion(explotacion[0])  # ID
-            # cargar las parcelas en la UI
 
         # Árbol de parcelas
         self.tree_parcelas = ttk.Treeview(
@@ -85,8 +81,10 @@ class ParcelaViewer(tk.Frame):
         for i in self.tree_parcelas.get_children():
             self.tree_parcelas.delete(i)
 
-        for id_, nombre, superficie, ubicacion in obtener_todas_parcelas():
-            self.tree_parcelas.insert("", "end", values=(id_, nombre, superficie, ubicacion))
+        explotacion = obtener_explotacion_activa()
+        if explotacion:
+            for id_, nombre, superficie, ubicacion in obtener_parcelas_por_explotacion(explotacion[0]):  # ID
+                self.tree_parcelas.insert("", "end", values=(id_, nombre, superficie, ubicacion))
 
     def abrir_formulario_nueva(self):
         self._abrir_formulario("nueva")

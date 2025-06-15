@@ -33,9 +33,8 @@ class VentanaPrincipal(tk.Tk):
         self.label_explotacion.pack(fill="x", padx=10, pady=5)
         
         self.actualizar_encabezado()
-        
+
         tk.Button(self.menu_frame, text="Explotaciones", command=self.abrir_gestion_explotaciones).pack(fill="x", pady=5)
-        tk.Button(self.menu_frame, text="Parcelas", command=self.abrir_gestion_parcelas).pack(pady=5, fill="x")
         tk.Button(self.menu_frame, text="Tipos de análisis", command=self.abrir_gestion_analisis).pack(pady=5, fill="x")
         tk.Button(self.menu_frame, text="Cerrar sesión", command=self.destroy).pack(side="bottom", pady=10,fill="x")
 
