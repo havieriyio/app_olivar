@@ -1,24 +1,32 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox,ttk
 from modelo import acceso_explotacion as modelo
-from modelo.acceso_explotacion import obtener_explotacion_activa
+from modelo.acceso_explotacion import obtener_explotacion_activa,obtener_todas_explotaciones
 from modelo.acceso_parcelas import obtener_parcelas_por_explotacion
 
-class ExplotacionViewer:
+class ExplotacionViewer(tk.Toplevel):
     def __init__(self, parent):
-        self.win = tk.Toplevel(parent)
-        self.principal = parent
-        self.win.title("Gestión de Explotaciones")
-        
-        self.frame_lista = tk.Frame(self.win)
-        self.frame_lista.pack(padx=10, pady=10)
+        super().__init__(parent)
+        self.master = parent
+        self.title("Gestión de Explotaciones")
+        self.geometry("600x400")
 
-        self.lista = tk.Listbox(self.frame_lista, width=50)
-        self.lista.pack(side=tk.LEFT)
+        # Treeview para mostrar explotaciones
+        self.tree = ttk.Treeview(self, columns=("Nombre", "Ubicación"), show="headings")
+        self.tree.heading("Nombre", text="Nombre")
+        self.tree.heading("Ubicación", text="Ubicación")
+        self.tree.pack(fill="both", expand=True, padx=10, pady=10)
 
-        self.scroll = tk.Scrollbar(self.frame_lista, command=self.lista.yview)
-        self.scroll.pack(side=tk.RIGHT, fill=tk.Y)
-        self.lista.config(yscrollcommand=self.scroll.set)
+        # Frame de botones
+        self.frame_botones = tk.Frame(self)
+        self.frame_botones.pack(pady=10)
+
+        # Botón activar
+        tk.Button(self.frame_botones, text="Activar", command=self.activar_explotacion_seleccionada).grid(row=0, column=0, padx=5)
+
+
+        # Cargar explotaciones en la tabla
+        self.cargar_explotaciones()
 
         self.frame_botones = tk.Frame(self.win)
         self.frame_botones.pack(pady=10)
@@ -66,17 +74,12 @@ class ExplotacionViewer:
             modelo.eliminar_explotacion(id_explotacion)
             self.recargar()
 
-    def activar(self):
-        seleccion = self.lista.curselection()
-        if seleccion:
-            texto = self.lista.get(seleccion)
-            id_explotacion = int(texto.split(" - ")[0])
-            modelo.establecer_explotacion_activa(id_explotacion)
-            
-        if self.principal and hasattr(self.principal, "actualizar_encabezado"):
-            self.principal.actualizar_encabezado()
+    def activar(self, id_explotacion):
+        modelo.establecer_explotacion_activa(id_explotacion)
+        self.master.actualizar_encabezado()
+        self.master.abrir_gestion_parcelas()
+        self.destroy()
 
-            self.recargar()
 
     def seleccionar_explotacion(self, id_explotacion):
         # Aquí marcas la explotación activa en la base de datos
@@ -90,3 +93,15 @@ class ExplotacionViewer:
         self.destroy()
 
     
+    def cargar_explotaciones(self):
+        explotaciones = obtener_todas_explotaciones()  # Devuelve lista de tuplas (id, nombre, ubicacion)
+        for exp in explotaciones:
+            self.tree.insert("", "end", iid=exp[0], values=(exp[1], exp[2]))
+
+    def activar_explotacion_seleccionada(self):
+        seleccion = self.tree.selection()
+        if not seleccion:
+            return
+
+        id_explotacion = int(seleccion[0])
+        self.activar(id_explotacion)
