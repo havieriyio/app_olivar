@@ -1,0 +1,52 @@
+# tests/test_sensor.py
+import unittest
+import sqlite3
+import os
+from db import registrar_sensor
+
+TEST_DB = "test_olivar.db"
+
+def crear_db_sensor_test():
+    conn = sqlite3.connect(TEST_DB)
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE sensor (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            tipo TEXT NOT NULL,
+            descripcion TEXT,
+            fecha_registro TEXT NOT NULL,
+            activo INTEGER DEFAULT 1
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+class TestSensor(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        crear_db_sensor_test()
+
+    def test_registro_sensor_valido(self):
+        resultado = registrar_sensor("temperatura", "Sensor zona sur", "2025-06-13", db_path=TEST_DB)
+        self.assertTrue(resultado)
+
+    def test_registro_sensor_tipo_invalido(self):
+        with self.assertRaises(ValueError):
+            registrar_sensor("humedad", "Sensor no permitido", "2025-06-13", db_path=TEST_DB)
+
+    def test_sensor_insertado_en_db(self):
+        registrar_sensor("composición", "Sensor experimental", "2025-06-13", db_path=TEST_DB)
+        conn = sqlite3.connect(TEST_DB)
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM sensor WHERE tipo='composición'")
+        count = cursor.fetchone()[0]
+        conn.close()
+        self.assertEqual(count, 1)
+
+    @classmethod
+    def tearDownClass(cls):
+        os.remove(TEST_DB)
+
+if __name__ == '__main__':
+    unittest.main()

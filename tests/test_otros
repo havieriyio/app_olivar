@@ -1,0 +1,81 @@
+# tests/test_otros.py
+import unittest
+import sqlite3
+import os
+from db import insertar_analisis, insertar_tratamiento, vincular_sensor_parcela
+
+TEST_DB = "test_olivar.db"
+
+def crear_tablas_test():
+    conn = sqlite3.connect(TEST_DB)
+    cursor = conn.cursor()
+    cursor.executescript("""
+        CREATE TABLE parcela (id INTEGER PRIMARY KEY, nombre TEXT);
+        INSERT INTO parcela (id, nombre) VALUES (1, 'Parcela A');
+
+        CREATE TABLE analisis (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            tipo TEXT NOT NULL,
+            fecha TEXT NOT NULL,
+            resultado TEXT,
+            id_parcela INTEGER,
+            FOREIGN KEY (id_parcela) REFERENCES parcela(id)
+        );
+
+        CREATE TABLE tratamiento (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            descripcion TEXT NOT NULL,
+            fecha TEXT NOT NULL,
+            confirmado INTEGER DEFAULT 0,
+            id_parcela INTEGER,
+            FOREIGN KEY (id_parcela) REFERENCES parcela(id)
+        );
+
+        CREATE TABLE sensor (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            tipo TEXT NOT NULL,
+            descripcion TEXT,
+            fecha_registro TEXT NOT NULL
+        );
+
+        INSERT INTO sensor (tipo, descripcion, fecha_registro) VALUES ('temperatura', 'Sensor 1', '2025-06-13');
+
+        CREATE TABLE sensor_parcela (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_sensor INTEGER,
+            id_parcela INTEGER,
+            FOREIGN KEY (id_sensor) REFERENCES sensor(id),
+            FOREIGN KEY (id_parcela) REFERENCES parcela(id)
+        );
+    """)
+    conn.commit()
+    conn.close()
+
+class TestOtros(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        crear_tablas_test()
+
+    def test_insertar_analisis_valido(self):
+        resultado = insertar_analisis("foliar", "2025-06-13", "Nutrientes bajos", 1, db_path=TEST_DB)
+        self.assertTrue(resultado)
+
+    def test_insertar_analisis_tipo_invalido(self):
+        with self.assertRaises(ValueError):
+            insertar_analisis("agua", "2025-06-13", "Incorrecto", 1, db_path=TEST_DB)
+
+    def test_insertar_tratamiento(self):
+        resultado = insertar_tratamiento("Fungicida", "2025-06-13", 1, 1, db_path=TEST_DB)
+        self.assertTrue(resultado)
+
+    def test_vincular_sensor_parcela(self):
+        resultado = vincular_sensor_parcela(1, 1, db_path=TEST_DB)
+        self.assertTrue(resultado)
+
+    @classmethod
+    def tearDownClass(cls):
+        os.remove(TEST_DB)
+
+if __name__ == '__main__':
+    unittest.main()

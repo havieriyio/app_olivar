@@ -1,0 +1,13 @@
+import sqlite3
+
+db_path = "olivar.db"  
+
+conn = sqlite3.connect(db_path)
+cursor = conn.cursor()
+
+cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+tablas = cursor.fetchall()
+conn.close()
+
+print("Tablas encontradas:", tablas)
+
