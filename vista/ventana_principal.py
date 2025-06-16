@@ -4,6 +4,8 @@ from .parcela_viewer import ParcelaViewer
 from .analisis_viewer import AnalisisViewer
 from .explotacion_viewer import ExplotacionViewer
 from modelo.acceso_explotacion import obtener_explotacion_activa
+from vista.configuracion_elementos import ConfiguracionElementosViewer
+
 
 class VentanaPrincipal(tk.Tk):
     def __init__(self,usuario):
@@ -37,6 +39,7 @@ class VentanaPrincipal(tk.Tk):
         tk.Button(self.menu_frame, text="Explotaciones", command=self.abrir_gestion_explotaciones).pack(fill="x", pady=5)
         tk.Button(self.menu_frame, text="Tipos de análisis", command=self.abrir_gestion_analisis).pack(pady=5, fill="x")
         tk.Button(self.menu_frame, text="Cerrar sesión", command=self.destroy).pack(side="bottom", pady=10,fill="x")
+        tk.Button(self.menu_frame, text="Configurar valores elementos", command=self.abrir_configuracion_elementos).pack(side="bottom", pady=10,fill="x")
 
         self.contenedor_panel = tk.Frame(self)
         self.contenedor_panel.pack(fill='both', expand=True)
@@ -47,7 +50,14 @@ class VentanaPrincipal(tk.Tk):
         self.main_frame = tk.Frame(self)
         self.main_frame.pack(side="right", expand=True, fill="both")
 
-    
+    def abrir_configuracion_elementos(self):  
+        if hasattr(self, "frame_actual"):
+            self.frame_actual.destroy()
+
+        self.frame_actual = ConfiguracionElementosViewer(self.contenedor_panel)
+        self.frame_actual.pack(fill="both", expand=True)
+
+
     def abrir_gestion_parcelas(self):
         self.ocultar_frames()
 
@@ -58,12 +68,12 @@ class VentanaPrincipal(tk.Tk):
         
             
     def abrir_gestion_analisis(self):
-        self.ocultar_frames()
 
-        # Crear siempre una nueva instancia garantiza que los datos se actualicen
-        self.frame_analisis = AnalisisViewer(self.contenedor_panel)
-        self.frame_analisis.pack(fill='both', expand=True)
+        if hasattr(self, "frame_actual"):
+            self.frame_actual.destroy()
 
+        self.frame_actual = AnalisisViewer(self.contenedor_panel)
+        self.frame_actual.pack(fill="both", expand=True)
         
     def ocultar_frames(self):
         for widget in self.contenedor_panel.winfo_children():
