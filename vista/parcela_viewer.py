@@ -137,7 +137,9 @@ class ParcelaViewer(tk.Frame):
                 return
 
             if modo == "nueva":
-                insertar_parcela(nombre, superficie, ubicacion)
+                explotacion = obtener_explotacion_activa()
+                idExplotacion = explotacion[0] 
+                insertar_parcela(nombre, superficie, ubicacion, idExplotacion)
             else:
                 actualizar_parcela(datos[0], nombre, superficie, ubicacion)
 

@@ -11,13 +11,13 @@ def obtener_todas_parcelas():
     conn.close()
     return resultado
 
-def insertar_parcela(nombre, superficie, ubicacion):
+def insertar_parcela(nombre, superficie, ubicacion, idExplotacion):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("""
-        INSERT INTO parcela (nombre, superficie, ubicacion)
-        VALUES (?, ?, ?)
-    """, (nombre, superficie, ubicacion))
+        INSERT INTO parcela (nombre, superficie, ubicacion, idExplotacion)
+        VALUES (?, ?, ?,?)
+    """, (nombre, superficie, ubicacion,idExplotacion))
     conn.commit()
     conn.close()
 
