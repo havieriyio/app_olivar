@@ -11,6 +11,11 @@ class ExplotacionViewer(tk.Toplevel):
         self.title("Gestión de Explotaciones")
         self.geometry("600x400")
 
+        self.id_explotacion_activa = None
+        activa = obtener_explotacion_activa()
+        if activa:
+            self.id_explotacion_activa = activa[0]
+
         # Treeview para mostrar explotaciones
         self.tree = ttk.Treeview(self, columns=("Nombre", "Ubicación"), show="headings")
         self.tree.heading("Nombre", text="Nombre")
@@ -37,12 +42,19 @@ class ExplotacionViewer(tk.Toplevel):
         self.recargar()
 
     def recargar(self):
-        # Borra todo el contenido del Treeview
+        # Limpia el Treeview
         for item in self.tree.get_children():
             self.tree.delete(item)
-        
-        # Carga las explotaciones nuevamente
-        self.cargar_explotaciones()
+
+        explotaciones = obtener_todas_explotaciones()  # o como se llame tu función
+        for expl in explotaciones:
+            self.tree.insert("", "end", iid=expl[0], values=(expl[1], expl[2]))
+
+        # Selecciona la explotación activa si está disponible
+        if self.id_explotacion_activa:
+            self.tree.selection_set(self.id_explotacion_activa)
+            self.tree.see(self.id_explotacion_activa)
+
 
     def anadir(self):
         top = tk.Toplevel(self)

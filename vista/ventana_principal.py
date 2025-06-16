@@ -11,7 +11,7 @@ class VentanaPrincipal(tk.Tk):
         
         self.usuario = usuario
         self.title("Sistema de Análisis de Olivar")
-        self.geometry("1500x600")
+        self.geometry("1500x800")
 
         self.panel_parcela = None
         
@@ -44,7 +44,7 @@ class VentanaPrincipal(tk.Tk):
         self.frame_parcelas = None
         self.frame_analisis = None
 
-        self.main_frame = tk.Frame(self, bg="white")
+        self.main_frame = tk.Frame(self)
         self.main_frame.pack(side="right", expand=True, fill="both")
 
     

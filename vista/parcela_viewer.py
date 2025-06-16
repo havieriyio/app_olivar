@@ -25,28 +25,37 @@ class ParcelaViewer(tk.Frame):
         self.panel_contenido = tk.Frame(self.gestion_frame)
         self.panel_contenido.pack(fill="both", expand=True)
 
+
         # Panel izquierdo: parcelas
         self.frame_izquierda = tk.Frame(self.panel_contenido)
         self.frame_izquierda.pack(side="left", fill="both", expand=True, padx=10, pady=10)
 
         # Panel derecho: árboles
-        self.frame_derecha = tk.Frame(self.panel_contenido, bg="white")
+        self.frame_derecha = tk.Frame(self.panel_contenido)
         self.frame_derecha.pack(side="left", fill="both", expand=True, padx=10, pady=10)
 
+        # Frame contenedor para la sección de parcelas
+        contenedor_parcelas = tk.Frame(self.frame_izquierda)
+        contenedor_parcelas.pack(fill="both", expand=True)
 
-        # Árbol de parcelas
-        self.tree_parcelas = ttk.Treeview(
-            self.frame_izquierda,
-            columns=["ID", "Nombre", "Superficie", "Ubicacion"],
-            show="headings",
-            height=12
-        )
-        for col in ["ID", "Nombre", "Superficie", "Ubicacion"]:
-            self.tree_parcelas.heading(col, text=col)
+        # Etiqueta de título para parcelas
+        titulo = tk.Label(contenedor_parcelas, text="Parcelas disponibles", font=("Arial", 12, "bold"))
+        titulo.pack(anchor="w", pady=(0, 5))  # alineado a la izquierda
+
+        # Tabla de parcelas debajo
+        self.tree_parcelas = ttk.Treeview(contenedor_parcelas, columns=("ID", "Nombre", "Superficie", "Ubicacion"), show="headings")
+        self.tree_parcelas.heading("ID", text="ID")
+        self.tree_parcelas.heading("Nombre", text="Nombre")
+        self.tree_parcelas.heading("Superficie", text="Superficie")
+        self.tree_parcelas.heading("Ubicacion", text="Ubicación")
         self.tree_parcelas.pack(fill="both", expand=True)
 
         # Evento de selección
         self.tree_parcelas.bind("<<TreeviewSelect>>", self.on_parcela_seleccionada)
+
+        # Etiqueta de título para los árboles
+        label_arboles = tk.Label(self.frame_derecha, text="Árboles disponibles", font=("Arial", 12, "bold"))
+        label_arboles.pack(anchor="w", pady=(0, 5))
 
         # Árbol de árboles
         self.tree_arboles = ttk.Treeview(
