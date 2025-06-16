@@ -7,6 +7,7 @@ from modelo.acceso_parcelas import obtener_parcelas_por_explotacion
 from modelo.acceso_arbol import obtener_arboles_por_parcela
 from modelo.acceso_explotacion import obtener_explotacion_activa
 import datetime
+from tkcalendar import DateEntry
 
 class AnalisisViewer(tk.Frame):
     def __init__(self, parent):
@@ -60,10 +61,10 @@ class AnalisisViewer(tk.Frame):
         frame_form = tk.LabelFrame(self, text="Nuevo análisis")
         frame_form.pack(fill="x", padx=10, pady=10)
 
-        tk.Label(frame_form, text="Fecha (YYYY-MM-DD):").grid(row=0, column=0)
-        self.fecha_entry = tk.Entry(frame_form)
-        self.fecha_entry.insert(0, datetime.date.today().isoformat())
-        self.fecha_entry.grid(row=0, column=1)
+        tk.Label(frame_form, text="Fecha:").grid(row=0, column=0)
+        self.fecha_cal = DateEntry(frame_form, date_pattern='dd-mm-yyyy')
+        self.fecha_cal.set_date(datetime.date.today())
+        self.fecha_cal.grid(row=0, column=1)
 
         tk.Label(frame_form, text="Descripción:").grid(row=1, column=0)
         self.descripcion_entry = tk.Entry(frame_form)
@@ -82,7 +83,7 @@ class AnalisisViewer(tk.Frame):
 
     def guardar_analisis(self):
         tipo = self.tipo_cb.get()
-        fecha = self.fecha_entry.get()
+        fecha = self.fecha_cal.get_date().strftime("%d-%m-%Y")
         descripcion = self.descripcion_entry.get()
         id_tipo = self.tipo_map.get(tipo)
 
@@ -147,8 +148,7 @@ class AnalisisViewer(tk.Frame):
 
     def limpiar_formulario(self):
         self.id_analisis_seleccionado = None
-        self.fecha_entry.delete(0, tk.END)
-        self.fecha_entry.insert(0, datetime.date.today().isoformat())
+        self.fecha_cal.set_date(datetime.date.today())
         self.descripcion_entry.delete(0, tk.END)
         for entry in self.resultados_entries.values():
             entry.delete(0, tk.END)
@@ -164,8 +164,8 @@ class AnalisisViewer(tk.Frame):
 
         resultado = obtener_resultado_analisis_por_id(self.id_analisis_seleccionado)
         if resultado:
-            self.fecha_entry.delete(0, tk.END)
-            self.fecha_entry.insert(0, resultado["fecha"])
+            fecha_obj = datetime.datetime.strptime(resultado["fecha"], "%d-%m-%Y").date()
+            self.fecha_cal.set_date(fecha_obj)
             self.descripcion_entry.delete(0, tk.END)
             self.descripcion_entry.insert(0, resultado["descripcion"])
 
