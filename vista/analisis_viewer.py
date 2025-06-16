@@ -61,52 +61,110 @@ class AnalisisViewer(tk.Frame):
         frame_form = tk.LabelFrame(self, text="Nuevo análisis")
         frame_form.pack(fill="x", padx=10, pady=10)
 
-        tk.Label(frame_form, text="Fecha:").grid(row=0, column=0)
-        self.fecha_cal = DateEntry(frame_form, date_pattern='dd-mm-yyyy')
-        self.fecha_cal.set_date(datetime.date.today())
-        self.fecha_cal.grid(row=0, column=1)
+        # Subframe para disposición en horizontal
+        frame_contenedor = tk.Frame(frame_form)
+        frame_contenedor.pack(fill="x")
 
-        tk.Label(frame_form, text="Descripción:").grid(row=1, column=0)
-        self.descripcion_entry = tk.Entry(frame_form)
-        self.descripcion_entry.grid(row=1, column=1)
+        # Izquierda: Fecha y descripción
+        frame_izquierdo = tk.Frame(frame_contenedor)
+        frame_izquierdo.pack(side="left", padx=(0, 10), fill="y")
 
-        self.resultados_entries = {}
-        etiquetas = ["N", "P", "K", "Ca", "Mg"]
-        for idx, etiqueta in enumerate(etiquetas):
-            tk.Label(frame_form, text=f"{etiqueta}:").grid(row=2 + idx, column=0)
-            entry = tk.Entry(frame_form)
-            entry.grid(row=2 + idx, column=1)
-            self.resultados_entries[etiqueta] = entry
+        tk.Label(frame_izquierdo, text="Fecha:").pack(anchor="w")
+        self.fecha_entry = DateEntry(frame_izquierdo, date_pattern='dd-mm-yyyy')
+        self.fecha_entry.pack(anchor="w", pady=(0, 10))
 
-        tk.Button(frame_form, text="Guardar análisis", command=self.guardar_analisis).grid(row=7, column=0)
-        tk.Button(frame_form, text="Eliminar análisis", command=self.eliminar_analisis).grid(row=7, column=1)
+        tk.Label(frame_izquierdo, text="Descripción:").pack(anchor="w")
+        self.descripcion_entry = tk.Entry(frame_izquierdo)
+        self.descripcion_entry.pack(anchor="w")
+
+        # Derecha: Tabla de resultados
+        frame_derecho = tk.Frame(frame_contenedor)
+        frame_derecho.pack(side="left", fill="x", expand=True)
+
+        self.tree_resultados = ttk.Treeview(frame_derecho, columns=("Parámetro", "Valor"), show="headings", height=5)
+        self.tree_resultados.heading("Parámetro", text="Parámetro")
+        self.tree_resultados.heading("Valor", text="Valor")
+        self.tree_resultados.pack(fill="x", expand=True)
+
+        self.tree_resultados.bind("<Double-1>", self.editar_celda_resultado)
+
+        for parametro in ["N", "P", "K", "Ca", "Mg"]:
+            self.tree_resultados.insert("", "end", values=(parametro, ""))
+
+        # Botones
+        tk.Button(frame_form, text="Guardar análisis", command=self.guardar_analisis).pack(side="left", padx=10, pady=10)
+        tk.Button(frame_form, text="Eliminar análisis", command=self.eliminar_analisis).pack(side="left", pady=10)
+
+
+    def editar_celda_resultado(self, event):
+        item = self.tree_resultados.identify_row(event.y)
+        col = self.tree_resultados.identify_column(event.x)
+
+        if not item or col != "#2":
+            return
+
+        x, y, width, height = self.tree_resultados.bbox(item, column=col)
+        valor_actual = self.tree_resultados.set(item, column="Valor")
+
+        entry = tk.Entry(self.tree_resultados)
+        entry.insert(0, valor_actual)
+        entry.place(x=x, y=y, width=width, height=height)
+        entry.focus()
+
+        def guardar_valor(_=None):
+            nuevo_valor = entry.get()
+            self.tree_resultados.set(item, column="Valor", value=nuevo_valor)
+            entry.destroy()
+
+        entry.bind("<Return>", guardar_valor)
+        entry.bind("<FocusOut>", guardar_valor)
+
+
+    def editar_resultado(self, event):
+        item_id = self.tree_resultados.identify_row(event.y)
+        col = self.tree_resultados.identify_column(event.x)
+        if not item_id or col != "#2":  # Solo permite editar columna "Valor"
+            return
+
+        x, y, width, height = self.tree_resultados.bbox(item_id, col)
+        entry_popup = tk.Entry(self.tree_resultados)
+        entry_popup.place(x=x, y=y, width=width, height=height)
+
+        def guardar_valor(evento):
+            nuevo_valor = entry_popup.get()
+            self.tree_resultados.set(item_id, column="Valor", value=nuevo_valor)
+            entry_popup.destroy()
+
+        entry_popup.bind("<Return>", guardar_valor)
+        entry_popup.focus()
+
 
     def guardar_analisis(self):
         tipo = self.tipo_cb.get()
-        fecha = self.fecha_cal.get_date().strftime("%d-%m-%Y")
+        fecha = self.fecha_entry.get_date().strftime('%Y-%m-%d')
         descripcion = self.descripcion_entry.get()
         id_tipo = self.tipo_map.get(tipo)
 
         id_parcela = self.obtener_id_parcela_seleccionada()
         id_arbol = self.obtener_id_arbol_seleccionado()
         resultados = []
-        for parametro, entry in self.resultados_entries.items():
-            valor_texto = entry.get()
-            if valor_texto:
+
+        for item in self.tree_resultados.get_children():
+            parametro, valor = self.tree_resultados.item(item)["values"]
+            if valor:
                 try:
-                    valor = float(valor_texto)
+                    valor_num = float(valor)
                 except ValueError:
                     messagebox.showerror("Error", f"El valor de {parametro} debe ser numérico.")
                     return
                 resultados.append({
                     "parametro": parametro,
-                    "valor": valor,
-                    "unidad": "mg/kg",  # puedes ajustar esto si varía por parámetro
+                    "valor": valor_num,
+                    "unidad": "mg/kg",
                     "metodo": None,
                     "incertidumbre": None,
                     "limite_cuantificacion": None
                 })
-
 
         if not (tipo and fecha and (id_parcela or id_arbol)):
             messagebox.showerror("Error", "Debe rellenar tipo, fecha y al menos una referencia (parcela o árbol)")
@@ -148,10 +206,10 @@ class AnalisisViewer(tk.Frame):
 
     def limpiar_formulario(self):
         self.id_analisis_seleccionado = None
-        self.fecha_cal.set_date(datetime.date.today())
+        self.fecha_entry.set_date(datetime.date.today())
         self.descripcion_entry.delete(0, tk.END)
-        for entry in self.resultados_entries.values():
-            entry.delete(0, tk.END)
+        for item in self.tree_resultados.get_children():
+            self.tree_resultados.set(item, column="Valor", value="")
 
     def cargar_analisis_seleccionado(self, event):
         seleccion = self.tree_analisis.selection()
@@ -164,15 +222,14 @@ class AnalisisViewer(tk.Frame):
 
         resultado = obtener_resultado_analisis_por_id(self.id_analisis_seleccionado)
         if resultado:
-            fecha_obj = datetime.datetime.strptime(resultado["fecha"], "%d-%m-%Y").date()
-            self.fecha_cal.set_date(fecha_obj)
+            self.fecha_entry.set_date(datetime.datetime.strptime(resultado["fecha"], "%Y-%m-%d"))
             self.descripcion_entry.delete(0, tk.END)
             self.descripcion_entry.insert(0, resultado["descripcion"])
 
-            for clave, entry in self.resultados_entries.items():
-                valor = resultado["resultados"].get(clave, "")
-                entry.delete(0, tk.END)
-                entry.insert(0, valor)
+            for item in self.tree_resultados.get_children():
+                parametro = self.tree_resultados.item(item)["values"][0]
+                valor = resultado["resultados"].get(parametro, "")
+                self.tree_resultados.set(item, column="Valor", value=valor)
 
     def actualizar_vista(self):
         tipos = obtener_tipos_analisis()
