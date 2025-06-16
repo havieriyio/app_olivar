@@ -158,3 +158,19 @@ def obtener_resultado_analisis_por_id(id_analisis, db_path="olivar.db"):
         "resultados": resultados
     }
 
+
+def obtener_parametros_configurados():
+    conn = sqlite3.connect(db_path="olivar.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT nombre, sugerido FROM parametro_config")
+    resultado = {nombre: sugerido for nombre, sugerido in cursor.fetchall()}
+    conn.close()
+    return resultado
+
+def obtener_valores_sugeridos():
+    conn = sqlite3.connect("olivar.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT nombre, valor_sugerido FROM elementos")
+    resultados = cursor.fetchall()
+    conn.close()
+    return {nombre: valor for nombre, valor in resultados}

@@ -1,13 +1,14 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from logica.analisis import crear_analisis_con_resultados, actualizar_analisis, eliminar_analisis
+from logica.analisis import crear_analisis_con_resultados, actualizar_analisis, eliminar_analisis   
 from logica.consulta import consultar_analisis_por_objetivo
-from modelo.acceso_analisis import obtener_tipos_analisis, obtener_resultado_analisis_por_id
+from modelo.acceso_analisis import obtener_tipos_analisis, obtener_resultado_analisis_por_id,obtener_valores_sugeridos
 from modelo.acceso_parcelas import obtener_parcelas_por_explotacion
 from modelo.acceso_arbol import obtener_arboles_por_parcela
 from modelo.acceso_explotacion import obtener_explotacion_activa
 import datetime
 from tkcalendar import DateEntry
+
 
 class AnalisisViewer(tk.Frame):
     def __init__(self, parent):
@@ -81,15 +82,17 @@ class AnalisisViewer(tk.Frame):
         frame_derecho = tk.Frame(frame_contenedor)
         frame_derecho.pack(side="left", fill="x", expand=True)
 
-        self.tree_resultados = ttk.Treeview(frame_derecho, columns=("Parámetro", "Valor"), show="headings", height=5)
+        self.tree_resultados = ttk.Treeview(frame_derecho, columns=("Parámetro", "Valor", "Sugerido"), show="headings", height=5)
         self.tree_resultados.heading("Parámetro", text="Parámetro")
         self.tree_resultados.heading("Valor", text="Valor")
+        self.tree_resultados.heading("Sugerido", text="Sugerido")
         self.tree_resultados.pack(fill="x", expand=True)
 
         self.tree_resultados.bind("<Double-1>", self.editar_celda_resultado)
 
-        for parametro in ["N", "P", "K", "Ca", "Mg"]:
-            self.tree_resultados.insert("", "end", values=(parametro, ""))
+        valores_sugeridos = obtener_valores_sugeridos()
+        for parametro, sugerido in valores_sugeridos.items():
+            self.tree_resultados.insert("", "end", values=(parametro, "", sugerido))
 
         # Botones
         tk.Button(frame_form, text="Guardar análisis", command=self.guardar_analisis).pack(side="left", padx=10, pady=10)
